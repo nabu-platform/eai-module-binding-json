@@ -52,7 +52,10 @@ public class Services {
 	
 	@SuppressWarnings("unchecked")
 	@WebResult(name = "uri")
-	public URI store(@WebParam(name = "data") @NotNull Object data, @WebParam(name = "charset") Charset charset, @WebParam(name = "context") String context) throws URISyntaxException, IOException {
+	public URI store(@WebParam(name = "data") Object data, @WebParam(name = "charset") Charset charset, @WebParam(name = "context") String context, @WebParam(name = "name") String name) throws URISyntaxException, IOException {
+		if (data == null) {
+			return null;
+		}
 		ComplexContent complexContent = data instanceof ComplexContent ? (ComplexContent) data : ComplexContentWrapperFactory.getInstance().getWrapper().wrap(data);
 		JSONBinding binding = new JSONBinding(complexContent.getType(), charset == null ? Charset.defaultCharset() : charset);
 		binding.setPrettyPrint(true);
@@ -69,7 +72,7 @@ public class Services {
 		else {
 			InputStream marshal = marshal(data, charset);
 			ContextualWritableDatastore<String> datastore = nabu.frameworks.datastore.Services.getAsDatastore(this.context);
-			return datastore.store(context, marshal, complexContent.getType().getName() + ".json", "application/json");
+			return datastore.store(context, marshal, name == null ? complexContent.getType().getName() + ".json" : name, "application/json");
 		}
 	}
 }
