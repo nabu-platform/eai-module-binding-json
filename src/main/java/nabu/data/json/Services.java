@@ -60,7 +60,7 @@ public class Services {
 		ComplexContent complexContent = data instanceof ComplexContent ? (ComplexContent) data : ComplexContentWrapperFactory.getInstance().getWrapper().wrap(data);
 		JSONBinding binding = new JSONBinding(complexContent.getType(), charset == null ? Charset.defaultCharset() : charset);
 		binding.setPrettyPrint(true);
-		DatastoreOutputStream streamable = nabu.frameworks.datastore.Services.streamable(runtime, context, complexContent.getType().getName() + ".json", "application/json");
+		DatastoreOutputStream streamable = nabu.frameworks.datastore.Services.streamable(runtime, context, name == null ? complexContent.getType().getName() + ".json" : name, "application/json");
 		if (streamable != null) {
 			try {
 				binding.marshal(streamable, data instanceof ComplexContent ? (ComplexContent) data : ComplexContentWrapperFactory.getInstance().getWrapper().wrap(data));
