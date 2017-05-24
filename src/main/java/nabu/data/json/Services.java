@@ -42,10 +42,15 @@ public class Services {
 	
 	@SuppressWarnings("unchecked")
 	@WebResult(name = "marshalled")
-	public InputStream marshal(@WebParam(name = "data") @NotNull Object data, @WebParam(name = "charset") Charset charset) throws IOException {
+	public InputStream marshal(@WebParam(name = "data") @NotNull Object data, @WebParam(name = "charset") Charset charset, @WebParam(name = "prettyPrint") Boolean prettyPrint) throws IOException {
 		ComplexContent complexContent = data instanceof ComplexContent ? (ComplexContent) data : ComplexContentWrapperFactory.getInstance().getWrapper().wrap(data);
 		JSONBinding binding = new JSONBinding(complexContent.getType(), charset == null ? Charset.defaultCharset() : charset);
-		binding.setPrettyPrint(true);
+		if (prettyPrint != null) {
+			binding.setPrettyPrint(prettyPrint);
+		}
+		else {
+			binding.setPrettyPrint(true);
+		}
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		binding.marshal(output, complexContent);
 		return new ByteArrayInputStream(output.toByteArray());
@@ -53,13 +58,18 @@ public class Services {
 	
 	@SuppressWarnings("unchecked")
 	@WebResult(name = "uri")
-	public URI store(@WebParam(name = "data") Object data, @WebParam(name = "charset") Charset charset, @WebParam(name = "context") String context, @WebParam(name = "name") String name) throws URISyntaxException, IOException {
+	public URI store(@WebParam(name = "data") Object data, @WebParam(name = "charset") Charset charset, @WebParam(name = "context") String context, @WebParam(name = "name") String name, @WebParam(name = "prettyPrint") Boolean prettyPrint) throws URISyntaxException, IOException {
 		if (data == null) {
 			return null;
 		}
 		ComplexContent complexContent = data instanceof ComplexContent ? (ComplexContent) data : ComplexContentWrapperFactory.getInstance().getWrapper().wrap(data);
 		JSONBinding binding = new JSONBinding(complexContent.getType(), charset == null ? Charset.defaultCharset() : charset);
-		binding.setPrettyPrint(true);
+		if (prettyPrint != null) {
+			binding.setPrettyPrint(prettyPrint);
+		}
+		else {
+			binding.setPrettyPrint(true);
+		}
 		DatastoreOutputStream streamable = nabu.frameworks.datastore.Services.streamable(runtime, context, name == null ? complexContent.getType().getName() + ".json" : name, "application/json");
 		if (streamable != null) {
 			try {
@@ -71,7 +81,7 @@ public class Services {
 			return streamable.getURI();
 		}
 		else {
-			InputStream marshal = marshal(data, charset);
+			InputStream marshal = marshal(data, charset, prettyPrint);
 			ContextualWritableDatastore<String> datastore = nabu.frameworks.datastore.Services.getAsDatastore(this.context);
 			return datastore.store(context, marshal, name == null ? complexContent.getType().getName() + ".json" : name, "application/json");
 		}
