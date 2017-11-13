@@ -25,6 +25,7 @@ import be.nabu.libs.types.api.ComplexContent;
 import be.nabu.libs.types.api.ComplexType;
 import be.nabu.libs.types.binding.api.Window;
 import be.nabu.libs.types.binding.json.JSONBinding;
+import be.nabu.libs.types.structure.StructureGenerator;
 
 @WebService
 public class Services {
@@ -36,6 +37,8 @@ public class Services {
 	public Object unmarshal(@WebParam(name = "input") @NotNull InputStream input, @NotNull @WebParam(name = "type") String type, @WebParam(name = "charset") Charset charset, @WebParam(name = "windows") List<Window> windows, @WebParam(name = "ignoreUndefinedFields") Boolean ignoreUndefinedFields) throws IOException, ParseException {
 		ComplexType resolve = (ComplexType) EAIResourceRepository.getInstance().resolve(type);
 		JSONBinding binding = new JSONBinding(resolve, charset == null ? Charset.defaultCharset() : charset);
+		binding.setAllowDynamicElements(true);
+		binding.setComplexTypeGenerator(new StructureGenerator());
 		binding.setIgnoreUnknownElements(ignoreUndefinedFields != null && ignoreUndefinedFields);
 		return binding.unmarshal(input, windows == null || windows.isEmpty() ? new Window[0] : windows.toArray(new Window[windows.size()]));
 	}
@@ -51,6 +54,7 @@ public class Services {
 		else {
 			binding.setPrettyPrint(true);
 		}
+		binding.setExpandKeyValuePairs(true);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		binding.marshal(output, complexContent);
 		return new ByteArrayInputStream(output.toByteArray());
