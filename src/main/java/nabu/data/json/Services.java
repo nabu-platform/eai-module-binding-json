@@ -37,6 +37,7 @@ public class Services {
 	public Object unmarshal(@WebParam(name = "input") @NotNull InputStream input, @NotNull @WebParam(name = "type") String type, @WebParam(name = "charset") Charset charset, @WebParam(name = "windows") List<Window> windows, @WebParam(name = "ignoreUndefinedFields") Boolean ignoreUndefinedFields) throws IOException, ParseException {
 		ComplexType resolve = (ComplexType) EAIResourceRepository.getInstance().resolve(type);
 		JSONBinding binding = new JSONBinding(resolve, charset == null ? Charset.defaultCharset() : charset);
+		binding.setIgnoreRootIfArrayWrapper(true);
 		binding.setAllowDynamicElements(true);
 		binding.setComplexTypeGenerator(new StructureGenerator());
 		binding.setIgnoreUnknownElements(ignoreUndefinedFields != null && ignoreUndefinedFields);
